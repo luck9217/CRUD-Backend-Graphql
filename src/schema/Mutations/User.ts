@@ -2,7 +2,7 @@ import { GraphQLBoolean, GraphQLID, GraphQLString } from "graphql";
 import { Users } from "../../Entities/Users";
 import { UserType } from "../TypeDefs/User";
 import bcrypt from "bcryptjs";
-import { Any } from "typeorm";
+import { MessageType } from "../TypeDefs/Messages";
 
 export const CREATE_USER = {
   type: UserType,
@@ -47,7 +47,7 @@ export const DELETE_USER = {
 };
 
 export const UPDATE_USER = {
-  type: GraphQLBoolean,
+  type: MessageType,
   args: {
     id: { type: GraphQLID },
     name: { type: GraphQLString },
@@ -56,15 +56,16 @@ export const UPDATE_USER = {
     newPassword: { type: GraphQLString },
   },
   async resolve(_: any, { id, name, username, oldPassword, newPassword }: any) {
-    console.log(id, name, username, oldPassword, newPassword);
-
     const userFound = await Users.findOne({ where: { id } });
 
     if (!userFound) {
       console.log("Sorry, but your ID doesn't exist. Please try again");
 
       //Graphql return
-      return false;
+      return {
+        success: false,
+        message: "Sorry, but your ID doesn't exist. Please try again",
+      };
     }
 
     const isMatch = await bcrypt.compare(oldPassword, userFound.password);
@@ -73,9 +74,13 @@ export const UPDATE_USER = {
       //False Password
       console.log("Invalid password. Please try again");
 
+      //Graphql return False
+      return {
+        success: isMatch,
+        message: "Invalid password. Please try again",
+      };
 
-    //Graphql return False
-      return isMatch;
+      isMatch;
     }
     //True Password
 
@@ -83,10 +88,12 @@ export const UPDATE_USER = {
 
     Users.update({ id }, { username, name, password: newPasswordHash });
 
-    console.log("Changed databases Successful")
+    console.log("Update User successfully");
 
-     //Graphql return True
-    return isMatch;
-
+    //Graphql return True
+    return {
+      success: isMatch,
+      message: "Update User successfully",
+    };
   },
 };
