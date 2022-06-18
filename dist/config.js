@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DB_NAME = exports.DB_PORT = exports.DB_HOST = exports.DB_PASSWORD = exports.DB_USERNAME = exports.PORT = void 0;
+const dotenv_1 = require("dotenv");
+(0, dotenv_1.config)();
+exports.PORT = process.env.PORT || 3306;
+exports.DB_USERNAME = process.env.DB_USERNAME;
+exports.DB_PASSWORD = process.env.DB_PASSWORD;
+exports.DB_HOST = process.env.DB_HOST;
+exports.DB_PORT = process.env.DB_PORT;
+exports.DB_NAME = process.env.DB_NAME;
