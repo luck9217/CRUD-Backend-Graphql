@@ -1,14 +1,16 @@
 import {DataSource} from 'typeorm';
 import { Users } from "./Entities/Users";
 
+import {DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME} from'./config'
+
 //typeorm config
 export const connectDB = new DataSource({
     type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "root",
-    password: "admin",
-    database: "usersdb",
+    host: DB_HOST,
+    port: Number(DB_PORT),
+    username: DB_USERNAME,
+    password: DB_PASSWORD,
+    database: DB_NAME,
     entities: [Users],
     synchronize: true, //review changes and upload
     logging: true,// information log
