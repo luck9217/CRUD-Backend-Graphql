@@ -61,14 +61,32 @@ export const UPDATE_USER = {
     const userFound = await Users.findOne({ where: { id } });
 
     if (!userFound) {
-      console.log("User not found");
+      console.log("Sorry, but your ID doesn't exist. Please try again");
+
+      //Graphql return
       return false;
     }
 
     const isMatch = await bcrypt.compare(oldPassword, userFound.password);
 
-    console.log("User with password its :",isMatch);
+    if (!isMatch) {
+      //False Password
+      console.log("Invalid password. Please try again");
 
+
+    //Graphql return False
+      return isMatch;
+    }
+    //True Password
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    Users.update({ id }, { username, name, password: newPasswordHash });
+
+    console.log("Changed databases Successful")
+
+     //Graphql return True
     return isMatch;
+
   },
 };
