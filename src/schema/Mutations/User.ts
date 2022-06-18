@@ -1,8 +1,9 @@
-import { GraphQLBoolean, GraphQLID, GraphQLString } from "graphql";
+import { GraphQLBoolean, GraphQLID, GraphQLInputObjectType, GraphQLString } from "graphql";
 import { Users } from "../../Entities/Users";
 import { UserType } from "../TypeDefs/User";
 import bcrypt from "bcryptjs";
 import { MessageType } from "../TypeDefs/Messages";
+
 
 export const CREATE_USER = {
   type: UserType,
@@ -50,12 +51,19 @@ export const UPDATE_USER = {
   type: MessageType,
   args: {
     id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    username: { type: GraphQLString },
-    oldPassword: { type: GraphQLString },
-    newPassword: { type: GraphQLString },
+    input: {
+      type: new GraphQLInputObjectType({
+        name: "UserInput",
+        fields: {
+          name: { type: GraphQLString },
+          username: { type: GraphQLString },
+          oldPassword: { type: GraphQLString },
+          newPassword: { type: GraphQLString },
+        },
+      }),
+    },
   },
-  async resolve(_: any, { id, name, username, oldPassword, newPassword }: any) {
+  async resolve(_: any, { id,input }: any) {
     const userFound = await Users.findOne({ where: { id } });
 
     if (!userFound) {
@@ -68,7 +76,7 @@ export const UPDATE_USER = {
       };
     }
 
-    const isMatch = await bcrypt.compare(oldPassword, userFound.password);
+    const isMatch = await bcrypt.compare(input.oldPassword, userFound.password);
 
     if (!isMatch) {
       //False Password
@@ -82,11 +90,11 @@ export const UPDATE_USER = {
     }
     //True Password
 
-    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    const newPasswordHash = await bcrypt.hash(input.newPassword, 10);
 
     const response = await Users.update(
       { id },
-      { username, name, password: newPasswordHash }
+      { username:input.username, name:input.name, password: newPasswordHash }
     );
 
     //affected=0 it doesnt uploaded
