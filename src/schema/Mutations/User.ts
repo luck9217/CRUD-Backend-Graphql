@@ -79,20 +79,34 @@ export const UPDATE_USER = {
         success: isMatch,
         message: "Invalid password. Please try again",
       };
-
-      isMatch;
     }
     //True Password
 
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-    Users.update({ id }, { username, name, password: newPasswordHash });
+    const response = await Users.update(
+      { id },
+      { username, name, password: newPasswordHash }
+    );
 
+    //affected=0 it doesnt uploaded
+    if (response.affected === 0) {
+      //No affected change
+      console.log("Ups! something worng");
+
+      //Graphql return False
+      return {
+        success: false,
+        message: "Ups! something worng",
+      };
+    }
+    //affected=1 if database its uploaded
     console.log("Update User successfully");
+    //console.log(response.affected);
 
     //Graphql return True
     return {
-      success: isMatch,
+      success: true,
       message: "Update User successfully",
     };
   },
