@@ -4,7 +4,7 @@ Database:MySql and Graphql
 
 Connection: TypeORM
 
-url : http://localhost:3000/Graphqlm
+url : http://localhost:3000/Graphql
 
 Unique Url with playground to use Query and Mutation (manipulate table)
 
